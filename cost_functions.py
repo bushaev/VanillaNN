@@ -1,5 +1,3 @@
-import numpy as np
-from abc import ABC, abstractmethod
 from activations import *
 
 
@@ -17,10 +15,10 @@ class QuadraticCost(CostFunction):
     def __init__(self, activation=Sigmoid):
         self.activation = activation
 
-    def evaluate(self, a, y):
+    def evaluate(self, a, y, weights=None):
         return 0.5 * np.linalg.norm(a - y) ** 2
 
-    def delta(self, z, a, y):
+    def delta(self, z, a, y, weights=None):
         return (a - y) * self.activation.diff(z)
 
 # TODO: implement cross-entrapy loss function

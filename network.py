@@ -1,30 +1,33 @@
-import numpy as np
+from activations import *
+from optimizers import *
 
 
 class Network:
-    def __init__(self, layers, activation, loss):
+    def __init__(self, layers, activation=Sigmoid, cost=QuadraticCost(), regularization=None):
         self.layers = layers
         self.activation = activation
-        self.loss = loss
+        self.cost = cost
         self.num_layers = len(layers)
+        self.regularization = regularization
 
         self.biases  = [np.random.randn(y, 1) for y in self.layers[1:]]
         self.weights = [np.random.randn(y, x) / np.sqrt(x)
                         for x, y in zip(self.layers[:-1], self.layers[1:])]
 
+    # TODO: implement loading a network from a file
     @staticmethod
     def from_file(filename):
-        pass
-
-    # TODO: implement loading weight from file
-    def load(self, file):
         pass
 
     # TODO: implement saving weights to file
     def save(self, file):
         pass
 
-    def feedforward(self, a):
+    def forward(self, a):
         for b, w in zip(self.biases, self.weights):
             a = self.activation.evaluate(np.dot(w, a) + b)
         return a
+
+    def optimize(self, tr_data, lr, batch_size=10, optimizer=SGD, np_epoch=1):
+        op = optimizer(str(self.regularization), self.weights, self.biases, self.cost, self.activation)
+        op.optimize(tr_data, lr, batch_size)
