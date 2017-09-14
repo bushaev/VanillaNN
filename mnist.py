@@ -1,19 +1,7 @@
+from mnist_loader import *
 from network import ClassificationNetwork
-import numpy as np
 
-model = ClassificationNetwork([1, 30, 2])
+model = ClassificationNetwork([784, 30, 10])
+training_data, validation_data, test_data = load_data_wrapper()
 
-
-def vectorized_result(x, n=2):
-    r = np.zeros((n, 1))
-    r[x] = 1
-    return r
-
-
-tr_x = np.random.randint(0, 1000000, size=10000)
-tr_y = [vectorized_result(int(x % 2 == 0)) for x in tr_x]
-
-print (tr_x[:2])
-print (tr_y[:2])
-
-model.optimize(tr_data=list(zip(tr_x, tr_y)), lr=0.01, nb_epoch=4)
+model.optimize(tr_data=list(training_data), lr=3, batch_size=10, nb_epoch=4)

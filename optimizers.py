@@ -70,3 +70,5 @@ class SGD(Optimizer):
 
         for mini_batch in batches:
             self.update_batch(mini_batch, lr)
+
+        return self.biases, self.weights

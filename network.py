@@ -30,7 +30,7 @@ class Network:
 
     def optimize(self, tr_data, lr, batch_size=10, optimizer=SGD, nb_epoch=1):
         op = optimizer(str(self.regularization), self.weights, self.biases, self.cost, self.activation)
-        op.optimize(tr_data, lr, batch_size)
+        self.biases, self.weights = op.optimize(tr_data, lr, batch_size)
 
 
 class ClassificationNetwork(Network):
@@ -47,7 +47,7 @@ class ClassificationNetwork(Network):
             if np.argmax(y) == np.argmax(self.forward(x)):
                 accurate += 1
 
-        return int(accurate * 100 / n_data)
+        return accurate * 100 / n_data
 
     def predict(self, x):
         return np.argmax(self.forward(x))
