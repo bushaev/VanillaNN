@@ -15,3 +15,6 @@ class L2(Regularization):
     def fn(self, weights, n_data):
         return (self.lmbda / (2 * n_data)) * sum(
             np.linalg.norm(w) ** 2 for w in weights)
+
+    def __str__(self):
+        return "l2"

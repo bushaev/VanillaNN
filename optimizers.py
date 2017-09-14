@@ -14,28 +14,28 @@ class Optimizer(ABC):
         self.biases = biases
         self.cost = cost
         self.activation = activation
-        self.num_layers = biases.shape[0]
+        self.num_layers = biases.shape[0] + 1
 
     def backprop(self, x, y):
-        nabla_w = np.zeros(self.weights.shape)
-        nabla_b = np.zeros(self.biases.shape)
+        nabla_b = [np.zeros(b.shape) for b in self.biases]
+        nabla_w = [np.zeros(w.shape) for w in self.weights]
         activations = [x]
         activation = x
         zs = []
 
-        for b, w in zip(self.weights, self.biases):
-            zs.append(np.dot(activation, w) + b)
+        for b, w in zip(self.biases, self.weights):
+            zs.append(np.dot(w, activation) + b)
             activation = self.activation.evaluate(zs[-1])
             activations.append(activation)
 
-        delta = self.cost.delta(zs[-1], activation, y)
+        delta = self.cost.delta(zs[-1], activations[-1], y)
         nabla_b[-1] = delta
-        nabla_w[-1] = np.dot(activations[-2].transpose(), delta)
+        nabla_w[-1] = np.dot(delta, activations[-2].transpose())
 
-        for l in range(self.num_layers):
+        for l in range(2, self.num_layers):
             delta = np.dot(self.weights[-l + 1].transpose(), delta) * self.activation.diff(zs[-l])
             nabla_b[-l] = delta
-            nabla_w[-l] = np.dot(activation[-l - 1].transpose(), delta)
+            nabla_w[-l] = np.dot(delta, activations[-l - 1].transpose())
 
         return nabla_b, nabla_w
 
@@ -51,8 +51,8 @@ class SGD(Optimizer):
                                   cost, activation)
 
     def update_batch(self, batch, lr):
-        nabla_b = np.zeros(self.biases.shape)
-        nabla_w = np.zeros(self.weights.shape)
+        nabla_b = [np.zeros(b.shape) for b in self.biases]
+        nabla_w = [np.zeros(w.shape) for w in self.weights]
         m = len(batch)
 
         for x, y in batch:
@@ -61,8 +61,8 @@ class SGD(Optimizer):
             nabla_w = [nw + dnw for nw, dnw in zip(nabla_w, delta_nabla_w)]
 
         # TODO: add regularization support
-        self.weights = [w - (lr / m) * nw for w, nw in zip(self.weights, nabla_w)]
-        self.biases = [b - (lr / m) * nb for b, nb in zip(self.biases, nabla_b)]
+        self.weights = np.array([w - (lr / m) * nw for w, nw in zip(self.weights, nabla_w)])
+        self.biases = np.array([b - (lr / m) * nb for b, nb in zip(self.biases, nabla_b)])
 
     def optimize(self, tr_data, lr, batch_size):
         np.random.shuffle(tr_data)
