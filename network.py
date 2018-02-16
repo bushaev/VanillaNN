@@ -10,7 +10,7 @@ class Network:
         self.cost = cost
         self.num_layers = len(layers)
         self.regularization = regularization
-
+        self.sc = Scaler()
         self.biases = np.array([np.random.randn(y, 1) for y in self.layers[1:]])
         self.weights = np.array([np.random.randn(y, x) / np.sqrt(x)
                                  for x, y in zip(self.layers[:-1], self.layers[1:])])

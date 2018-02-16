@@ -21,3 +21,18 @@ def data(path, tr_len=50000):
 
     return (X_tr, y_tr, X_val, y_val)
 
+class Scaler():
+    def __init__(self, X=None):
+        if X is not None:
+            self.fit(X)
+
+    def fit(self, X):
+        self.mean = X.mean()
+        self.std = X.std()
+
+    def transform(self, X):
+        return (X - self.mean) / self.std
+
+    def fit_transform(self, X):
+        self.fit(X)
+        return self.transform(X)
