@@ -23,4 +23,10 @@ class QuadraticCost(CostFunction):
     def delta(self, z, a, y):
         return (a - one_hot(y, 10).T) * self.activation.diff(z)
 
-# TODO: implement cross-entrapy loss function
+class NLL(CostFunction):
+
+    def evaluate(self, a, y):
+        return (-one_hot(y, 10).T * np.log(a)).sum()
+
+    def delta(self, z, a, y):
+        a - one_hot(y, 10).T

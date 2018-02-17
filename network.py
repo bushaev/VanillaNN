@@ -6,11 +6,14 @@ from utils import *
 class Network:
     def __init__(self, layers, activation=Sigmoid, cost=QuadraticCost(), regularization=None):
         self.layers = layers
-        self.activation = activation
-        self.cost = cost
         self.num_layers = len(layers)
+        if type(activation) == list:
+            self.activations = [activation[0] for _ in range(self.num_layers - 1)]
+            self.activations.append(activation[1])
+        else:
+            self.activations = [activation for _ in range(self.num_layers)]
+        self.cost = cost
         self.regularization = regularization
-        self.sc = Scaler()
         self.biases = np.array([np.random.randn(y, 1) for y in self.layers[1:]])
         self.weights = np.array([np.random.randn(y, x) / np.sqrt(x)
                                  for x, y in zip(self.layers[:-1], self.layers[1:])])
@@ -26,12 +29,12 @@ class Network:
 
     def forward(self, X):
         a = X.T
-        for b, w in zip(self.biases, self.weights):
-            a = self.activation.evaluate(np.dot(w, a) + b)
+        for b, w, act in zip(self.biases, self.weights, self.activations):
+            a = act.evaluate(np.dot(w, a) + b)
         return a
 
     def optimize(self, X, y, lr, batch_size=10, optimizer=SGD):
-        op = optimizer(str(self.regularization), self, self.cost, self.activation)
+        op = optimizer(self)
         op.optimize(X, y, lr, batch_size)
 
     def backprop(self, X, y):
@@ -42,9 +45,9 @@ class Network:
         Zs = []
         m = X.shape[0]
 
-        for b, w in zip(self.biases, self.weights):
+        for b, w, a in zip(self.biases, self.weights, self.activations):
             Zs.append(np.dot(w, activation) + b)
-            activation = self.activation.evaluate(Zs[-1])
+            activation = a.evaluate(Zs[-1])
             As.append(activation)
 
         delta = self.cost.delta(Zs[-1], As[-1], y)
@@ -52,7 +55,7 @@ class Network:
         nabla_w[-1] =  1 / m * np.dot(delta, As[-2].T)
 
         for l in range(2, self.num_layers):
-            delta = np.dot(self.weights[-l + 1].T, delta) * self.activation.diff(Zs[-l])
+            delta = np.dot(self.weights[-l + 1].T, delta) * self.activations[-l].diff(Zs[-l])
             nabla_b[-l] = 1 / m * np.sum(delta, axis=1, keepdims=True)
             nabla_w[-l] = 1 / m * np.dot(delta, As[-l - 1].T)
 

@@ -6,12 +6,9 @@ from cost_functions import QuadraticCost
 
 
 class Optimizer(ABC):
-    def __init__(self, regularization, model,
-                 cost=QuadraticCost, activation=Sigmoid):
-        self.regularization = regularization
+    def __init__(self, model):
         self.model = model
-        self.cost = cost
-        self.activation = activation
+        self.cost = model.cost
 
     @abstractclassmethod
     def optimize(self, X, y, lr, batch_size):
@@ -19,10 +16,8 @@ class Optimizer(ABC):
 
 
 class SGD(Optimizer):
-    def __init__(self, regularization, model,
-                 cost=QuadraticCost, activation=Sigmoid):
-        super(SGD, self).__init__(regularization, model,
-                                  cost, activation)
+    def __init__(self, model):
+        super(SGD, self).__init__(model)
 
     def update_batch(self, X, y, lr):
         nabla_b, nabla_w = self.model.backprop(X, y)

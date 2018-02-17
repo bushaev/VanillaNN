@@ -22,4 +22,21 @@ class Sigmoid(Activation):
         return Sigmoid.evaluate(z) * (1 - Sigmoid.evaluate(z))
 
 
-# TODO: implement softmax, relu, tanh activation functions
+class Relu(Activation):
+    @staticmethod
+    def evaluate(z):
+        return np.maximum(0, z)
+
+    @staticmethod
+    def diff(z):
+        return np.asarray(z > 0, dtype=np.uint8)
+
+class Softmax(Activation):
+    @staticmethod
+    def evaluate(z):
+        z = np.exp(z)
+        return z / np.sum(z, axis=0)
+
+    @staticmethod
+    def diff(z):
+        pass

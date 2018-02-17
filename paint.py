@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter.colorchooser import askcolor
+from activations import Relu, Softmax
 from PIL import Image, ImageDraw, ImageColor
 import matplotlib.pyplot as plt
 from network import ClassificationNetwork
@@ -31,7 +32,7 @@ class Paint(object):
         self.image = Image.new("RGB", (200, 200), 0)
         self.draw = ImageDraw.Draw(self.image)
 
-        self.model = ClassificationNetwork([784, 100, 10])
+        self.model = ClassificationNetwork([784, 100, 10], activation=[Relu, Softmax])
         X_tr, y_tr, _, _ = data('mnist')
         self.sc = Scaler(X_tr)
         X_tr = self.sc.transform(X_tr)
