@@ -2,13 +2,44 @@ from activations import *
 from optimizers import *
 from utils import *
 
+class LayerNetwork():
+    def __init__(self, layers, cost=QuadraticCost()):
+        self.layers = layers
+        self.cost = cost
+
+    def forward(self, X):
+        a = X.T
+        for layer in self.layers:
+            a = layer.forward(a)
+        return a
+
+    def optimize(self, X, y, lr, batch_size):
+        for k in range(0, len(X), batch_size):
+            X_batch = X[k:k+batch_size]
+            y_batch = y[k:k+batch_size]
+
+            a = X_batch.T
+            As = [a]
+            for layer in self.layers:
+                As.append(layer.forward(a))
+                a = As[-1]
+
+            delta = self.cost.delta(None, As[-1], y_batch)
+            grads, error = self.layers[-1].backward(delta, is_final=True, A_prev=As[-2])
+            self.layers[-1].update(*grads, lr=lr, m=batch_size)
+
+            for l in range(2, len(self.layers)):
+                grads, error = self.layers[-l].backward(error, A_prev=As[-l - 1])
+                self.layers[-l].update(*grads, lr=lr, m=batch_size)
+
+
 
 class Network:
     def __init__(self, layers, activation=Sigmoid, cost=QuadraticCost(), regularization=None):
         self.layers = layers
         self.num_layers = len(layers)
         if type(activation) == list:
-            self.activations = [activation[0] for _ in range(self.num_layers - 1)]
+            self.activations = [activation[0] for _ in range(self.num_layers - 2)]
             self.activations.append(activation[1])
         else:
             self.activations = [activation for _ in range(self.num_layers)]
@@ -62,11 +93,11 @@ class Network:
         return nabla_b, nabla_w
 
 
-class ClassificationNetwork(Network):
+class ClassificationNetwork(LayerNetwork):
     def optimize(self, X, y, lr, batch_size=10, optimizer=SGD, nb_epoch=1):
         for j in range(nb_epoch):
             X, y = shuffle(X, y)
-            super(ClassificationNetwork, self).optimize(X, y, lr, batch_size, optimizer)
+            super(ClassificationNetwork, self).optimize(X, y, lr, batch_size)
             print(f"Accuracy after {j + 1} epochs ", str(self.accuracy(X, y)), "%")
 
     def accuracy(self, X, y):

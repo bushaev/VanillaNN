@@ -29,4 +29,4 @@ class NLL(CostFunction):
         return (-one_hot(y, 10).T * np.log(a)).sum()
 
     def delta(self, z, a, y):
-        a - one_hot(y, 10).T
+        return a - one_hot(y, 10).T
