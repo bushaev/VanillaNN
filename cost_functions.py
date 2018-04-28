@@ -12,6 +12,7 @@ class CostFunction(ABC):
         pass
 
 
+#TODO: fix old activations
 class QuadraticCost(CostFunction):
     def __init__(self, activation=Sigmoid):
         self.activation = activation
@@ -23,8 +24,8 @@ class QuadraticCost(CostFunction):
     def delta(self, z, a, y):
         return (a - one_hot(y, 10).T) * self.activation.diff(z)
 
+#TODO: fix one hot encoding
 class NLL(CostFunction):
-
     def evaluate(self, a, y):
         return (-one_hot(y, 10).T * np.log(a)).sum()
 

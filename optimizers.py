@@ -1,10 +1,6 @@
 from abc import ABC, abstractclassmethod
 import numpy as np
 
-from activations import Sigmoid
-from cost_functions import QuadraticCost
-
-
 class Optimizer(ABC):
     def __init__(self, model):
         self.model = model
@@ -15,6 +11,8 @@ class Optimizer(ABC):
         pass
 
 
+#TODO: update this class
+#TODO: add momentum
 class SGD(Optimizer):
     def __init__(self, model):
         super(SGD, self).__init__(model)
@@ -32,3 +30,6 @@ class SGD(Optimizer):
             self.update_batch(X[k:k+batch_size], y[k:k+batch_size], lr)
             a = self.model.forward(X[k:k+batch_size])
             cs.append(self.cost.evaluate(a, y[k:k+batch_size]))
+
+#TODO: add RMSprop, Adam
+#TODO: add learning rate schedule (exponential anealing, sgdr, cyclic learning rate, one cycle learning rate)

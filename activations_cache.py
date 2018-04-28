@@ -32,7 +32,6 @@ class Relu(Activation):
         self.z = np.maximum(0, z)
         return self.z
 
-    @staticmethod
     def diff(self):
         return np.asarray(self.z > 0, dtype=np.uint8)
 
@@ -43,6 +42,6 @@ class Softmax(Activation):
         self.z = self.z / np.sum(self.z, axis=0)
         return self.z
 
-    #TODO: Implement diff
+    #TODO: Implement diff. Not important as often used as last layer activation.
     def diff(self):
         return None

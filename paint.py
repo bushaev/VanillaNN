@@ -4,8 +4,10 @@ from activations import Relu, Softmax
 from PIL import Image, ImageDraw, ImageColor
 import matplotlib.pyplot as plt
 from network import ClassificationNetwork
+from fully_connected import Dense
 from utils import data, Scaler
 import numpy as np
+from cost_functions import NLL
 
 
 class Paint(object):
@@ -32,7 +34,11 @@ class Paint(object):
         self.image = Image.new("RGB", (200, 200), 0)
         self.draw = ImageDraw.Draw(self.image)
 
-        self.model = ClassificationNetwork([784, 100, 10], activation=[Relu, Softmax])
+        # self.model = ClassificationNetwork([784, 100, 10], activation=[Relu, Softmax])
+        self.model = ClassificationNetwork([
+            Dense(784, 100, activation=Relu),
+            Dense(100, 10, activation=Softmax),
+        ], cost=NLL())
         X_tr, y_tr, _, _ = data('mnist')
         self.sc = Scaler(X_tr)
         X_tr = self.sc.transform(X_tr)

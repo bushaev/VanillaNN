@@ -30,6 +30,7 @@ class Dense(Layer):
 
         return (db, dW), dA_prev
 
+    #TODO: Move this to optimizers
     def update(self, *args, **kwargs):
         db, dW = args
         lr = kwargs['lr']

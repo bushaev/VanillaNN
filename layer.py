@@ -12,3 +12,5 @@ class Layer(object):
     @abstractmethod
     def update(self, *args, **kwargs):
         pass
+
+#TODO: Add folowing layers: Dropout, Convolutional, MaxPooling, AvgPooling, Flatten, BatchNormalization
