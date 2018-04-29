@@ -17,20 +17,20 @@ class LayerNetwork():
         return a
 
     def gradients(self, X, y):
-        grads = []
         As = [X.T]
         for layer in self.layers:
             As.append(layer.forward(As[-1]))
 
         delta = self.cost.delta(None, As[-1], y)
-        g, e = self.layers[-1].backward(delta, is_final=True, A_prev=As[-2])
-        grads.append(g)
+        dA_prev = self.layers[-1].backward(delta, is_final=True)
 
         for l in range(2, len(self.layers) + 1):
-            g, e = self.layers[-l].backward(e, A_prev=As[-l - 1])
-            grads.append(g)
+            dA_prev = self.layers[-l].backward(dA_prev)
 
-        return grads[::-1]
+        grads = []
+        for l in self.layers:
+            grads.append([p.grad() for p in l.parameters()])
+        return grads
 
     def optimize(self, X, y, batch_size, optim):
         for k in range(0, len(X), batch_size):
@@ -42,12 +42,10 @@ class LayerNetwork():
                 As.append(layer.forward(As[-1]))
 
             delta = self.cost.delta(None, As[-1], y_batch)
-            grads, error = self.layers[-1].backward(delta, is_final=True, A_prev=As[-2])
-            # self.layers[-1].update(optim)
+            dA_prev = self.layers[-1].backward(delta, is_final=True)
 
             for l in range(2, len(self.layers) + 1):
-                grads, error = self.layers[-l].backward(error, A_prev=As[-l - 1])
-                # self.layers[-l].update(optim)
+                dA_prev = self.layers[-l].backward(dA_prev)
 
             optim.update()
 

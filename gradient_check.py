@@ -26,7 +26,7 @@ def check_dense(epsilon=1e-9, error_epsilon=1e-6):
 
     grads = net.gradients(X, y)
     for lind in range(2):
-        db, dW = grads[lind]
+        dW, db = grads[lind]
         for ind in range(net.layers[lind].bias.param.shape[0]):
             net.layers[lind].bias.param[ind, 0] += epsilon
             cost_plus = evaluate_cost(net, X, y)

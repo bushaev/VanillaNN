@@ -15,9 +15,9 @@ class Dense(Layer):
         return [self.weight, self.bias]
 
     def forward(self, x):
+        self.x = x
         return self.activation.evaluate(np.dot(self.weight.get(), x) + self.bias.get())
 
-    # TODO: cache A_prev from forward pass
     def backward(self, *args, **kwargs):
         if 'is_final' in kwargs:
             is_final = kwargs['is_final']
@@ -32,10 +32,10 @@ class Dense(Layer):
 
         m = delta.shape[1]
         self.bias.set_grad(np.sum(delta, axis=1, keepdims=True) / m)
-        self.weight.set_grad(np.dot(delta, kwargs['A_prev'].T) / m)
+        self.weight.set_grad(np.dot(delta, self.x.T) / m)
 
         dA_prev = np.dot(self.weight.get().T, delta)
 
-        return (self.bias.grad(), self.weight.grad()), dA_prev
+        return dA_prev
 
 
