@@ -7,10 +7,13 @@ class Dense(Layer):
         self.activation = activation()
         self.weight = np.random.rand(n_output, n_input) / np.sqrt(n_input)
         self.bias = np.zeros(shape=(n_output, 1))
+        self.db = None
+        self.dW = None
 
     def forward(self, x):
         return self.activation.evaluate(np.dot(self.weight, x) + self.bias)
 
+    # TODO: cache A_prev from forward pass
     def backward(self, *args, **kwargs):
         if 'is_final' in kwargs:
             is_final = kwargs['is_final']
@@ -23,21 +26,18 @@ class Dense(Layer):
             dA = args[0]
             delta = dA * self.activation.diff()
 
-        db = np.sum(delta, axis=1, keepdims=True)
-        dW = np.dot(delta, kwargs['A_prev'].T)
+        m = delta.shape[1]
+        self.db = np.sum(delta, axis=1, keepdims=True) / m
+        self.dW = np.dot(delta, kwargs['A_prev'].T) / m
 
         dA_prev = np.dot(self.weight.T, delta)
 
-        return (db, dW), dA_prev
+        return (self.db, self.dW), dA_prev
 
-    #TODO: Move this to optimizers
-    def update(self, *args, **kwargs):
-        db, dW = args
-        lr = kwargs['lr']
-        m = kwargs['m']
-
-        self.weight = self.weight - (lr / m) * dW
-        self.bias = self.bias - (lr / m) * db
+    def update(self, optim):
+        if self.db is not None and self.dW is not None:
+            self.weight = optim.update_weights(self.weight, self.dW)
+            self.bias = optim.update_weights(self.bias, self.db)
 
 
 
