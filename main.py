@@ -15,6 +15,8 @@ X_tr, y_tr, X_val, y_val = data('mnist')
 X_tr = scaler.fit_transform(X_tr)
 X_val = scaler.transform(X_val)
 
-model.optimize(X_tr, y_tr, SGDM(lr=0.1), batch_size=64, nb_epoch=4)
+
+optim = SGDM(0.1, model.parameters())
+model.optimize(X_tr, y_tr, optim, batch_size=128, nb_epoch=4)
 # model.optimize(X_tr, y_tr, lr=0.01, batch_size=64, nb_epoch=4)
 print (model.accuracy(X_val, y_val))

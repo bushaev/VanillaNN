@@ -10,6 +10,10 @@ class Layer(object):
         pass
 
     @abstractmethod
+    def parameters(self):
+        pass
+
+    @abstractmethod
     def update(self, *args, **kwargs):
         pass
 

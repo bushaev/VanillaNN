@@ -7,6 +7,9 @@ class LayerNetwork():
         self.layers = layers
         self.cost = cost
 
+    def parameters(self):
+        return np.concatenate([l.parameters() for l in self.layers])
+
     def forward(self, X):
         a = X.T
         for layer in self.layers:
@@ -40,11 +43,13 @@ class LayerNetwork():
 
             delta = self.cost.delta(None, As[-1], y_batch)
             grads, error = self.layers[-1].backward(delta, is_final=True, A_prev=As[-2])
-            self.layers[-1].update(optim)
+            # self.layers[-1].update(optim)
 
             for l in range(2, len(self.layers) + 1):
                 grads, error = self.layers[-l].backward(error, A_prev=As[-l - 1])
-                self.layers[-l].update(optim)
+                # self.layers[-l].update(optim)
+
+            optim.update()
 
 
 class ClassificationNetwork(LayerNetwork):
